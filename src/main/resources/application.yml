@@ -1,0 +1,40 @@
+server:
+  port: 8081
+  max-http-request-header-size: 1024KB
+  servlet:
+    context-path: /dev
+    session:
+      timeout: 1800
+  tomcat:
+    relaxed-path-chars: <,>,[,\,],^,`,{,|,}
+    relaxed-query-chars: <,>,[,\,],^,`,{,|,}
+
+keycloak:
+  base-url: http://localhost:8043/
+  realm: quyvx
+  realm-url: ${keycloak.base-url}/realms/${keycloak.realm}
+  client:
+    id: campusio-backend
+    secret: FQkCaI4nMcIImVayAmDTP3yplYpKt7nD
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ${keycloak.client.id}
+            client-name: campusio-backend
+            client-secret: ${keycloak.client.secret}
+            provider: keycloak
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          keycloak:
+            authorization-uri: ${keycloak.realm-url}/protocol/openid-connect/auth
+            jwk-set-uri: ${keycloak.realm-url}/protocol/openid-connect/certs
+            token-uri: ${keycloak.realm-url}/protocol/openid-connect/token
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${keycloak.realm-url}/protocol/openid-connect/certs
