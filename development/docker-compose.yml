@@ -1,0 +1,64 @@
+services:
+  # POSTGRESQL
+  db-postgresql:
+    image: quay.io/debezium/postgres:17
+    command:
+      -c work_mem=512MB
+      -c maintenance_work_mem=512MB
+      -c max_wal_size=2GB
+    container_name: postgresql-base-common
+    volumes:
+      - base-common-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=postgres                                                                      # Only development
+      - POSTGRES_PASSWORD=postgres                                                                  # Only development
+      - ALLOW_EMPTY_PASSWORD=yes                                                                    # Only development
+    networks:
+      - base-common-network
+
+  # KEYCLOAK
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.1
+    container_name: keycloak-base-common
+    environment:
+      - KEYCLOAK_ADMIN=admin                                                                        # Only development
+      - KEYCLOAK_ADMIN_PASSWORD=admin                                                               # Only development
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://db-postgresql/keycloak?user=postgres&password=postgres
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./import:/opt/keycloak/data/import
+    ports:
+      - 8045:8080
+    depends_on:
+      - db-postgresql
+    networks:
+      - base-common-network
+
+  # CAMPUSIO BACKEND
+  campusio:
+    image: maximus9802/base-common:latest                                                           # Replace by your image
+    container_name: campusio-backend
+    ports:
+      - 8087:8081
+    environment:
+      - KEYCLOAK_BASE_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=campusio
+      - KEYCLOAK_CLIENT_ID=campusio-backend
+      - KEYCLOAK_CLIENT_SECRET=QoEgwydbkRN092L9FRgW3PkjHHnCjZTH                                     # Replace by your client secret
+    depends_on:
+      - keycloak
+      - db-postgresql
+    networks:
+      - base-common-network
+
+volumes:
+  base-common-volume:
+
+networks:
+  base-common-network:

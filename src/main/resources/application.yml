@@ -10,12 +10,12 @@ server:
     relaxed-query-chars: <,>,[,\,],^,`,{,|,}
 
 keycloak:
-  base-url: http://localhost:8043/
-  realm: quyvx
+  base-url: ${KEYCLOAK_BASE_URL:http://localhost:8045/}
+  realm: ${KEYCLOAK_REALM:campusio}
   realm-url: ${keycloak.base-url}/realms/${keycloak.realm}
   client:
-    id: campusio-backend
-    secret: FQkCaI4nMcIImVayAmDTP3yplYpKt7nD
+    id: ${KEYCLOAK_CLIENT_ID:campusio-backend}
+    secret: ${KEYCLOAK_CLIENT_SECRET:QoEgwydbkRN092L9FRgW3PkjHHnCjZTH}
 
 spring:
   security:
