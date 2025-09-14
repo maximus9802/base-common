@@ -17,6 +17,8 @@ keycloak:
     id: ${KEYCLOAK_CLIENT_ID:campusio-backend}
     secret: ${KEYCLOAK_CLIENT_SECRET:QoEgwydbkRN092L9FRgW3PkjHHnCjZTH}
 
+develop-flag: true
+
 spring:
   security:
     oauth2:
